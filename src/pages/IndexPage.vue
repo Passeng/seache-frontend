@@ -10,13 +10,13 @@
     <my-divider />
     <a-tabs v-model:activeKey="activeKey" @change="onTabChange">
       <a-tab-pane key="post" tab="文章">
-        <post-list />
+        <post-list postlist="postList" />
       </a-tab-pane>
       <a-tab-pane key="picture" tab="图片">
         <picture-list />
       </a-tab-pane>
       <a-tab-pane key="user" tab="用户">
-        <user-list />
+        <user-list user-list="userList" />
       </a-tab-pane>
     </a-tabs>
   </div>
@@ -29,6 +29,7 @@ import PictureList from "@/components/PictureList.vue";
 import UserList from "@/components/UserList.vue";
 import MyDivider from "@/components/MyDivider.vue";
 import { useRoute, useRouter } from "vue-router";
+import myAxios from "@/plugins/myAxios";
 
 const router = useRouter();
 const route = useRoute();
@@ -41,12 +42,22 @@ const initSearchParams = {
 
 const activeKey = route.params.category;
 const searchParams = ref(initSearchParams);
+const postList = ref([]);
+const userList = ref([]);
 
 watchEffect(() => {
   searchParams.value = {
     ...initSearchParams,
     text: route.query.text,
   } as any;
+});
+
+myAxios.post("post/list/page/vo", {}).then((res: any) => {
+  postList.value = res.records;
+});
+
+myAxios.post("user/list/page/vo", {}).then((res: any) => {
+  userList.value = res.records;
 });
 
 const onSearch = (value: string) => {

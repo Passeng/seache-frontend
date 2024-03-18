@@ -1,5 +1,32 @@
-<template>用户列表</template>
+<template>
+  <a-list item-layout="horizontal" :data-source="props.userList">
+    <template #renderItem="{ item }">
+      <a-list-item>
+        <a-card hoverable style="width: 240px">
+          <template #cover>
+            <img
+              alt="example"
+              src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
+            />
+          </template>
+          <a-card-meta :title="item.title">
+            <template #description>{{ item.content }}</template>
+          </a-card-meta>
+        </a-card>
+      </a-list-item>
+    </template>
+  </a-list>
+</template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { withDefaults, defineProps } from "vue";
+interface Props {
+  userList: any[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  userList: () => [],
+});
+</script>
 
 <style scoped></style>
