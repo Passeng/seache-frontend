@@ -13,7 +13,7 @@
         <post-list postlist="postList" />
       </a-tab-pane>
       <a-tab-pane key="picture" tab="图片">
-        <picture-list />
+        <picture-list pictureList="pictureList" />
       </a-tab-pane>
       <a-tab-pane key="user" tab="用户">
         <user-list user-list="userList" />
@@ -44,6 +44,7 @@ const activeKey = route.params.category;
 const searchParams = ref(initSearchParams);
 const postList = ref([]);
 const userList = ref([]);
+const pictureList = ref([]);
 
 watchEffect(() => {
   searchParams.value = {
@@ -58,6 +59,10 @@ myAxios.post("post/list/page/vo", {}).then((res: any) => {
 
 myAxios.post("user/list/page/vo", {}).then((res: any) => {
   userList.value = res.records;
+});
+
+myAxios.post("picture/list/page/vo", {}).then((res: any) => {
+  pictureList.value = res.records;
 });
 
 const onSearch = (value: string) => {
