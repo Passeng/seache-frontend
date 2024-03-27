@@ -30,46 +30,82 @@ import UserList from "@/components/UserList.vue";
 import MyDivider from "@/components/MyDivider.vue";
 import { useRoute, useRouter } from "vue-router";
 import myAxios from "@/plugins/myAxios";
+import { message } from "ant-design-vue";
 
 const router = useRouter();
 const route = useRoute();
 
-const initSearchParams = {
-  text: "",
-  pageNum: 1,
-  pageSize: 10,
-};
-
 const activeKey = route.params.category;
-const searchParams = ref(initSearchParams);
 const postList = ref([]);
 const userList = ref([]);
 const pictureList = ref([]);
 
+const initSearchParams = {
+  text: "",
+  type: activeKey,
+  pageNum: 1,
+  pageSize: 10,
+};
+
+const searchParams = ref(initSearchParams);
+
+/**
+ * 加载聚合数据
+ * @param params
+ */
+const loadAllData = (params: any) => {
+  const query = {
+    ...params,
+    searchText: params.text,
+  };
+
+  myAxios.post("search/all", query).then((res: any) => {
+    userList.value = res.userList;
+    postList.value = res.postList;
+    pictureList.value = res.pictureList;
+  });
+};
+
+/**
+ * 加载单类数据
+ * @param params
+ */
+const loadData = (params: any) => {
+  const { type } = params;
+  if (!type) {
+    message.error("类别为空");
+    return;
+  }
+  const query = {
+    ...params,
+    searchText: params.text,
+  };
+
+  myAxios.post("search/all", query).then((res: any) => {
+    if (type === "post") {
+      postList.value = res.postList;
+    } else if (type === "user") {
+      userList.value = res.userList;
+    } else if (type === "picture") {
+      pictureList.value = res.pictureList;
+    }
+  });
+};
+
 watchEffect(() => {
   searchParams.value = {
     ...initSearchParams,
+    type: route.params.category,
     text: route.query.text,
   } as any;
-});
-
-myAxios.post("post/list/page/vo", {}).then((res: any) => {
-  postList.value = res.records;
-});
-
-myAxios.post("user/list/page/vo", {}).then((res: any) => {
-  userList.value = res.records;
-});
-
-myAxios.post("picture/list/page/vo", {}).then((res: any) => {
-  pictureList.value = res.records;
+  loadData(searchParams.value);
 });
 
 const onSearch = (value: string) => {
-  alert(value);
   router.push({
     query: searchParams.value,
   });
+  loadData(searchParams.value);
 };
 
 const onTabChange = (key: string) => {
